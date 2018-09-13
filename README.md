@@ -1,2 +1,2 @@
 # tutoriais
-Contém tutoriais sobre bancos de dados, análises dedados e outros materiais didáticos
+Contém tutoriais sobre bancos de dados, análises de dados e outros materiais didáticos
