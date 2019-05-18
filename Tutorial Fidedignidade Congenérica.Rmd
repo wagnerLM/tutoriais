@@ -1,0 +1,87 @@
+---
+title: "Fidedignidade de testes congenéricos"
+author: "Wagner de Lara Machado, PhD - PPG Psicologia PUCRS"
+date: "17/05/2019"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+# Fidedignidade de testes congenéricos com R: modelos confirmatórios e exploratórios
+* [Existem limitações no uso do coeficiente *__alpha de Cronbach__* como estimativa de fidedignidade de testes psicológicos](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2792363/)
+* A principal é que o *__alpha de Cronbach__* foi desenvolvido no contexto da Teoria Clássica dos Testes (TCT) e seu cálculo assume um pressuposto pouco realista, a *__tau-equivalência__*, isto é, que os testes ou itens possuam a mesma relação com o *__escore verdadeiro__*
+* Para explicar esse conceito, é necessário retomar o modelo linear dos testes de *__Spearman__*:
+  * **_X_** = **_T_** + **_E_**
+  * Em que **_X_** é o escore observado em um teste ou item, **_T_** é o escore verdadeiro e **_E_** é o erro de medida
+* Paralelismo, tau-equivalência e testes congenéricos
+  * Para entender esses conceitos, pode-se utilizar um diagrama representando o [Modelo linear de Spearman](https://en.wikipedia.org/wiki/Congeneric_reliability)
+  ![Modelo linear de Spearman](C:\Users\wag_p\Documents\Congeneric_measurement_model.png)
+* Em que **_T_** é o escore verdadeiro, **_λ_** a relação do teste/item com o escore verdadeiro (e.g. carga fatorial), **_X_** o teste ou item, e **_e_** o erro de medida. 
+    * Se Var(**_e_**) e **_λ_** são iguais para todos os testes ou itens, então tem-se testes/itens paralelos (paralelismo)
+    * Se **_λ_** são iguais para todos os testes ou itens, então tem-se testes/itens tau-equivalentes
+    * Se Var(**_e_**) e **_λ_** podem variar para todos os testes ou itens, então tem-se testes/itens congenéricos
+* Esses pressupostos restritivos do *__alpha de Cronbach__* levaram o Editor do European Journal of Psychological Assessment a incentivar o uso de medidas alternativas de fidedignidade em submissões, em [editorial publicado](https://econtent.hogrefe.com/doi/10.1027/1015-5759/a000069)
+* Somando-se a esses argumentos, estudos indicam que índices alternativos possuem [performance superior](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4880791/) ao *__alpha de Cronbach__* sob condições realísticas, especialmente o *__McDonald's Omega__* (*__ω__*)
+* O coeficiente *__McDonald's Omega__* (*__ω__*) é calculado a partir da seguinte [fórmula](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4880791/):
+
+$ω= (∑λj)^2/[(∑λj)^2+ ∑(1-λj^2)]$
+
+* A seguir serão apresentadas formas de calcular o índice *__McDonald's Omega__* (*__ω__*) com métodos confirmatórios e exploratórios:
+
+## Carregando banco exemplo da [Escala de Satisfação com a Vida](https://www.researchgate.net/publication/279194945_Medindo_a_satisfacao_com_a_vida_dos_medicos_no_Brasil/download)
+```
+ESV<-read.csv("https://raw.githubusercontent.com/wagnerLM/SBP/master/ESV.csv",sep=";")
+
+View(ESV)
+```
+### Para as análises, instale os seguintes pacotes
+```
+ininstall.packages("lavaan")
+ininstall.packages("semTools")
+ininstall.packages("psych")
+```
+
+## Com análise fatorial confirmatória
+### Crie seu modelo com a sintaxe do lavaan
+```
+ESV.mod <- 'SV =~ ESV1 + ESV2 + ESV3 + ESV4 + ESV5'
+```
+### Ative o pacote
+```
+library(lavaan)
+```
+### Calcule o ajuste do modelo aos dados
+```
+fit.ESV.mod <- cfa(model = ESV.mod,data = ESV,ordered = colnames(ESV))
+```
+### Inspecione o ajuste do modelo
+```
+summary(fit.ESV.mod,fit.measures = TRUE, standardized=TRUE, rsq=TRUE)
+```
+### Calcule o McDonald's *__ω__* com o pacote semTools
+```
+library(semTools)
+reliability(fit.ESV.mod)
+```
+
+## Com análise exploratória
+### Ative o pacote
+```
+library(psych)
+```
+### Conduza uma análise fatorial exploratória e avalie seu modelo
+```
+fa(ESV[1:5],1,cor="poly")
+```
+### Calcule o McDonald's *__ω__*
+```
+omega(ESV[1:5],poly = T)
+```
+### Sobre os pacotes:
+#### [psych](http://personality-project.org/r/html/guttman.html)
+#### [lavaan](http://lavaan.ugent.be/)
+#### [semTools](https://cran.r-project.org/web/packages/semTools/semTools.pdf)
+* Agradecimento: ao acadêmico de Psicologia da PUCRS, Bernard Martins Paz, por suas contribuições e revisão das versões iniciais deste material
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
